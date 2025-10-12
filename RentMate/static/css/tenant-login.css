@@ -4,19 +4,26 @@
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    height: 100vh;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../background.jpg') no-repeat center center;
+    min-height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                url('../background.jpg') no-repeat center center fixed;
     background-size: cover;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .header {
     position: absolute;
-    top: 40px;
-    left: 60px;
+    top: 60px;
+    left: 90px;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -31,7 +38,7 @@ body {
 .logo-circle {
     width: 80px;
     height: 80px;
-    background-color: #4169E1;
+    background-color: #1740A4;
     border-radius: 50%;
 }
 

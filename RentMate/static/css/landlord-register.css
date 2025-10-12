@@ -4,19 +4,25 @@
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    height: 100%;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../background.jpg') no-repeat center center;
+    min-height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../background.jpg') no-repeat center center fixed;
     background-size: cover;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .header {
     position: absolute;
-    top: 25px;
-    left: 60px;
+    top: 60px;
+    left: 90px;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -31,7 +37,7 @@ body {
 .logo-circle {
     width: 80px;
     height: 80px;
-    background-color: #4169E1;
+    background-color: #1740A4;
     border-radius: 50%;
 }
 
@@ -47,7 +53,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 120px 60px 10px 60px;
+    padding: 30px 60px;
     max-width: 1400px;
     width: 100%;
     margin: 0 auto;
@@ -55,17 +61,25 @@ body {
 
 .registration-section {
     flex: 0 0 400px;
+    position: relative;
+    margin-top: 70px;
+}
+
+.registration-section form {
+    padding-top: 10px;
 }
 
 .form-row {
     display: flex;
     gap: 15px;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .form-group {
     margin-bottom: 20px;
     flex: 1;
+    position: relative;
+    min-height: 60px;
 }
 
 .form-group label {
@@ -154,24 +168,52 @@ body {
     text-align: right;
 }
 
-.error-message {
-    background-color: rgba(220, 53, 69, 0.9);
-    color: white;
-    padding: 12px 20px;
+/* Error and Success Messages */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-message,
+.success-message {
+    position: absolute;
+    top: -60px;
+    left: 0;
+    right: 0;
+    display: block;
+    width: 100%;
+    text-align: center;
     border-radius: 8px;
-    margin-bottom: 20px;
     font-size: 14px;
+    padding: 12px 15px;
+    z-index: 10;
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    pointer-events: none;
+}
+
+.error-message {
+    background-color: rgba(220, 53, 69, 0.95);
+    color: white;
 }
 
 .success-message {
-    background-color: rgba(40, 167, 69, 0.9);
+    background-color: rgba(40, 167, 69, 0.95);
     color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 14px;
 }
 
+.hidden-message {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Responsive */
 @media (max-width: 1024px) {
     .main-container {
         flex-direction: column;
