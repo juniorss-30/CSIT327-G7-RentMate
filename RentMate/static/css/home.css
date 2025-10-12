@@ -216,41 +216,6 @@ body {
     background-color: #dc2626;
 }
 
-.form-row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 0px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-    flex: 1;
-}
-
-.form-group label {
-    display: block;
-    color: white;
-    font-size: 16px;
-    margin-bottom: 8px;
-    font-weight: 500;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 15px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.95);
-    transition: all 0.3s ease;
-}
-
-.form-group input:focus {
-    outline: none;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.3);
-}
-
 @media (max-width: 1200px) {
     .dashboard-cards {
         grid-template-columns: repeat(2, 1fr);
