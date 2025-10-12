@@ -18,25 +18,11 @@
    ```bash
    pip install -r requirements.txt
 Or install Django directly:
-
-bash
-Copy code
 pip install Django
-Run database migrations
-
-bash
-Copy code
 python manage.py migrate
-Create a superuser
-
-bash
-Copy code
 python manage.py createsuperuser
-Run the development server
-
-bash
-Copy code
 python manage.py runserver
+
 Access the app
 
 Login Page: http://127.0.0.1:8000/login/
@@ -46,10 +32,12 @@ Home Page: http://127.0.0.1:8000/home/
 Admin Panel: http://127.0.0.1:8000/admin/
 
 👥 Team Members
-Name	Role	CIT-U Email
-Joseph James Banico	Lead Developer (QA)	josephjames.banico@cit.edu
-Julius C. Bargamento	Backend Developer	julius.bargamento@cit.edu
-Junpaul Arradaza	Frontend Developer	junpaul.arradaza@cit.edu
+| Name                     | Role                | CIT-U Email                                                     |
+| ------------------------ | ------------------- | --------------------------------------------------------------- |
+| **Joseph James Banico**  | Lead Developer (QA) | [josephjames.banico@cit.edu](mailto:josephjames.banico@cit.edu) |
+| **Julius C. Bargamento** | Backend Developer   | [julius.bargamento@cit.edu](mailto:julius.bargamento@cit.edu)   |
+| **Junpaul Arradaza**     | Frontend Developer  | [junpaul.arradaza@cit.edu](mailto:junpaul.arradaza@cit.edu)     |
 
 🌐 Deployed Link
+
 Not available at the moment
