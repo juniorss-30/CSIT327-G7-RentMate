@@ -13,14 +13,16 @@
 ---
 
 ## ⚙️ Setup & Run Instructions
-#NOTE 
-to update the sql for now run this command on terminal
-- **py manage.py makemigrations**
-- **manage.py migrate**
+
 
 1. **Install dependencies**
    ```bash
    pip install -r requirements.txt
+
+#NOTE 
+to update the sql for now run this command on terminal
+- **py manage.py makemigrations**
+- **manage.py migrate**
 
 Access the app
 
