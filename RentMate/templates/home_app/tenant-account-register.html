@@ -58,7 +58,7 @@
 
         <!-- Tenant Register Section -->
         <div class="tenants-section">
-                    <div class="registration-section">
+            <div class="registration-section">
             {% if messages %}
                 {% for message in messages %}
                     {% if message.tags == 'error' %}
@@ -99,8 +99,11 @@
                 </div>
                 <div class="form-group">
                     <label for="password">Default Password</label>
-                    <input type="password" id="password" name="password" value="{{ data.password|default:'' }}" required>
-                    <span>123456</span>
+                    <div class="form-row">
+                        <input type="password" id="password" name="password" value="{{ data.password|default:'' }}" required>
+                        123456
+                    </div>
+                    <span>Must be changed by tenant</span>
                 </div>
 
 
@@ -136,10 +139,9 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="payment_status">Payment Status</label>
-{#                        <input type="text" id="payment_status" name="payment_status" value="{{ data.payment_status|default:'' }}" required>#}
-                        <select id="payment_status" name="payment_status">
-                            <option value="Paid" selected>Paid</option>
-                            <option value="Pending">Pending</option>
+                        <select id="payment_status" name="payment_status" required>
+                            <option value="Paid">Paid</option>
+                            <option value="Pending" selected>Pending</option>
                             <option value="Overdue">Overdue</option>
                         </select>
                     </div>
@@ -150,8 +152,7 @@
                 </div>
                 <div class="form-group">
                         <label for="status">Status</label>
-{#                        <input type="checkbox" id="phone_number" name="phone_number" value="{{ data.phone_number|default:'' }}" required>#}
-                        <select id="status" name="status">
+                        <select id="status" name="status" required>
                             <option value="Active" selected>Active</option>
                             <option value="Terminated">Terminated</option>
                             <option value="Pending">Pending</option>
@@ -165,6 +166,7 @@
                 <a href="{% url 'tenant_list' %}" class="btn">Cancel</a>
                 <button type="submit" class="btn">Create Tenant</button>
             </form>
+
         </div>
         </div>
     </div>

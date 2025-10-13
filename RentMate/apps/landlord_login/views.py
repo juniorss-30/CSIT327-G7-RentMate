@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Landlord
+from ..dashboard.models import Tenant
 import logging
 import re
 
@@ -12,8 +13,14 @@ def landlord_login(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
+        #checks if email is registered in Landlord table in database
+        try:
+            landlord = Landlord.objects.get(email=email)
+        except Landlord.DoesNotExist:
+            messages.error(request, 'Invalid Credentials')
+            logger.warning(f"Login attempt with non-existing email: {email}")
+            return render(request, 'logins/landlord-login.html')
 
-        landlord = Landlord.objects.get(email=email)
         if landlord.password == password:
             return redirect('home') # Redirect to dashboard
         messages.error(request, 'Invalid Credentials')
@@ -25,10 +32,14 @@ def tenant_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        if email == MOCK_USERS["tenant"]["email"] and password == MOCK_USERS["tenant"]["password"]:
-            return redirect('home')  # Redirect to dashboard
-        else:
-            messages.error(request, 'Invalid credentials for tenant.')
+
+        # checks if email is registered in Tenant table in database
+        try:
+            tenant = Tenant.objects.get(email=email)
+        except:
+            messages.error(request, 'Invalid Credentials')
+            logger.warning(f"Login attempt with non-existing email: {email}")
+            return render(request, 'logins/tenant-login.html')
     return render(request, 'logins/tenant-login.html')
 
 def index(request):
