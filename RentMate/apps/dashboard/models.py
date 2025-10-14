@@ -1,10 +1,9 @@
 from django.db import models
-from ..landlord_login.models import Landlord
 
 # Create your models here.
 class Tenant(models.Model):
     # tenant account information
-    assigned_landlord = models.ForeignKey(Landlord, on_delete=models.CASCADE) # kailangan pani? himo himo rani nako, kung ma delete gani ang landlord account ma delete pud mga tenant
+    #assigned_landlord = models.ForeignKey(Landlord, on_delete=models.CASCADE) #gamiton sa tenant list view
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)

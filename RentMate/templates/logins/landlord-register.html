@@ -28,34 +28,34 @@
             <form method="POST">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="address">Email</label>
-                    <input type="email" id="email" name="email" value="{{ data.email|default:'' }}" required>
+                    <label for="{{ form.email.id_for_label }}">Email</label>
+                    {{ form.email }}
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="first_name">First Name</label>
-                        <input type="text" id="first_name" name="first_name" value="{{ data.first_name|default:'' }}" required>
+                        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                        {{ form.first_name }}
                     </div>
                     <div class="form-group">
-                        <label for="last_name">Last Name</label>
-                        <input type="text" id="last_name" name="last_name" value="{{ data.last_name|default:'' }}" required>
+                        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                        {{ form.last_name }}
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="address">Address</label>
-                    <input type="text" id="address" name="address" value="{{ data.address|default:'' }}" required>
+                    <label for="{{ form.address.id_for_label }}">Address</label>
+                    {{ form.address }}
                 </div>
                 <div class="form-group">
-                    <label for="phone_number">Phone number</label>
-                    <input type="tel" id="phone_number" name="phone_number" value="{{ data.phone_number|default:'' }}" required>
+                    <label for="{{ form.phone_number.id_for_label }}">Phone number</label>
+                    {{ form.phone_number }}
                 </div>
                 <div class="form-group">
-                    <label for="password">Enter New Password</label>
-                    <input type="password" id="password" name="password" value="{{ data.password|default:'' }}" required>
+                    <label for="{{ form.password.id_for_label }}">Enter New Password</label>
+                    {{ form.password }}
                 </div>
                 <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" value="{{ data.confirm_password|default:'' }}" required>
+                    <label for="{{ form.confirm_password.id_for_label }}">Confirm Password</label>
+                    {{ form.confirm_password }}
                 </div>
                 <button type="submit" class="register-btn">Register</button>
                 <div class="login-link">

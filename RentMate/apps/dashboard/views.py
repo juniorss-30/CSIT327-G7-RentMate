@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Tenant
-from ..landlord_login.models import Landlord
 import logging
 import re
 

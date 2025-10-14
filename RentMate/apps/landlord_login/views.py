@@ -1,30 +1,38 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Landlord
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from django.db import transaction
+from .models import LandlordProfile
+from .forms import LandlordRegistrationForm
 from ..dashboard.models import Tenant
 import logging
-import re
 
 # Initialize logger
 logger = logging.getLogger(__name__)
+
 
 def landlord_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        #checks if email is registered in Landlord table in database
-        try:
-            landlord = Landlord.objects.get(email=email)
-        except Landlord.DoesNotExist:
-            messages.error(request, 'Invalid Credentials')
-            logger.warning(f"Login attempt with non-existing email: {email}")
-            return render(request, 'logins/landlord-login.html')
+        # Try to authenticate using Django's built-in authentication
+        user = authenticate(request, username=email, password=password)
 
-        if landlord.password == password:
-            return redirect('home') # Redirect to dashboard
-        messages.error(request, 'Invalid Credentials')
-        logger.warning(f"Failed landlord login attempt with email: {email}")
+        if user is not None:
+            # Check if user is a landlord
+            try:
+                landlord_profile = LandlordProfile.objects.get(user=user)
+                login(request, user)
+                logger.info(f"Landlord {user.email} logged in successfully")
+                return redirect('home')  # Redirect to dashboard
+            except LandlordProfile.DoesNotExist:
+                messages.error(request, 'Account not found or not a landlord account.')
+                logger.warning(f"Login attempt with landlord account but no profile: {email}")
+        else:
+            messages.error(request, 'Invalid Credentials')
+            logger.warning(f"Failed login attempt for email: {email}")
 
     return render(request, 'logins/landlord-login.html')
 
@@ -45,82 +53,49 @@ def tenant_login(request):
 def index(request):
     return render(request, 'index.html')  # Render the main landing page
 
+@transaction.atomic #If an error occurs within the block, no changes is saved to the database
 def landlord_register(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        address = request.POST.get('address')
-        phone_number = request.POST.get('phone_number')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
+        form = LandlordRegistrationForm(request.POST)
+        if form.is_valid():
+            try:
+                # Create User
+                user = User.objects.create_user(
+                    username=form.cleaned_data['email'],
+                    email=form.cleaned_data['email'],
+                    password=form.cleaned_data['password'],
+                    first_name=form.cleaned_data['first_name'],
+                    last_name=form.cleaned_data['last_name']
+                )
 
-        #Checks if phone number contains letters
-        if re.search(r'[A-Za-z]', phone_number):
-            messages.error(request, 'Phone number must not contain letters.')
-            return render(request, 'logins/landlord-register.html', {'data': request.POST})
+                # Create Landlord Profile
+                LandlordProfile.objects.create(
+                    user=user,
+                    address=form.cleaned_data['address'],
+                    phone_number=form.cleaned_data['phone_number']
+                )
+                messages.success(request, 'Registration successful! Please login.')
+                logger.info(f"New landlord registered: {form.cleaned_data.get('first_name')} {form.cleaned_data.get('last_name')}")
+                return redirect('landlord_login')
 
-        #Checks if phone number is valid Philippine number
-        if not (phone_number.startswith('+63') or phone_number.startswith('09')):
-            messages.error(request, 'Phone number must start with +63 or 09')
-            return render(request, 'logins/landlord-register.html', {'data': request.POST})
+            except Exception as e:
+                messages.error(request, 'Registration failed. Please try again.')
+                logger.error(f"Registration error: {str(e)}")
 
-        if phone_number.startswith('+63'):
-            if len(phone_number) != 12:
-                messages.error(request, 'Phone number must have 11 digits.')
-                return render(request, 'logins/landlord-register.html', {'data': request.POST})
-        if phone_number.startswith('09'):
-            if len(phone_number) != 11:
-                messages.error(request, 'Phone number must have 11 digits.')
-                return render(request, 'logins/landlord-register.html', {'data': request.POST})
+        else:
+            # Convert form errors to messages
+            for field_name, field_errors in form.errors.items():
+                for error in field_errors:
+                    clean_error = error.strip()
+                    print(f"Error in {field_name}: {clean_error}")
+                    if field_name == '__all__':
+                        messages.error(request, clean_error)
+                    else:
+                        messages.error(request, f"{clean_error}")
+    else:
+        form = LandlordRegistrationForm()
 
-        #Checks if password is in valid format
-        if len(password) < 8:
-            messages.error(request, 'Password must be at least 8 characters and include letters, numbers, and a special character.')
-            return render(request, 'logins/landlord-register.html', {'data': request.POST})
-
-        #Checks if password contains letters
-        if not re.search(r'[A-Za-z]', password):
-            messages.error(request, 'Password must be at least 8 characters and include letters, numbers, and a special character.')
-            return render(request, 'logins/landlord-register.html', {'data': request.POST})
-
-        #Checks if password contains numbers
-        if not re.search(r'\d', password):
-            messages.error(request, 'Password must be at least 8 characters and include letters, numbers, and a special character.')
-            return render(request, 'logins/landlord-register.html', {'data': request.POST})
-
-        #Check if password contains special characters
-        if not re.search(r'[^A-Za-z0-9]', password):
-            messages.error(request, 'Password must be at least 8 characters and include letters, numbers, and a special character.')
-            return render(request, 'logins/landlord-register.html', {'data': request.POST})
-        
-        # Validate passwords match
-        if password != confirm_password:
-            messages.error(request, 'Passwords do not match.')
-            return render(request, 'logins/landlord-register.html', {'data': request.POST})
-
-        # Checks if email exits
-        if Landlord.objects.filter(email=email).exists():
-            messages.error(request, 'Email is already used.')
-            return render(request, 'logins/landlord-register.html', {'data': request.POST})
-
-        landlord = Landlord(
-            email=email,
-            first_name=first_name,
-            last_name=last_name,
-            address=address,
-            phone_number=phone_number,
-            password=password,
-        )
-        landlord.save()
-
-        # Here you would typically create a new user in the database
-        # For now, we'll just show a success message
-        messages.success(request, 'Registration successful! Please login.')
-        logger.info(f"New landlord registered: {first_name} {last_name}")
-        return redirect('landlord_login')
-    
-    return render(request, 'logins/landlord-register.html', {'data': request.POST})
+    return render(request, 'logins/landlord-register.html', {'form': form})
 
 
 
