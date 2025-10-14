@@ -1,6 +1,5 @@
 from django import forms
 from .models import Tenant
-from apps.landlord_login.models import Landlord
 import re
 
 class TenantRegisterForm(forms.Form):
