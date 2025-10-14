@@ -1,9 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
 from .forms import TenantRegisterForm
 from .models import Tenant
 
 def tenant_register(request):
+    if not request.user.is_authenticated:
+        return redirect('landlord_login')
     if request.method == 'POST':
         form = TenantRegisterForm(request.POST)
         if form.is_valid():
@@ -32,8 +36,12 @@ def tenant_register(request):
 
 
 def home_view(request):
+    if not request.user.is_authenticated:
+        return redirect('landlord_login')
     return render(request, "home_app/home.html")
 
 
 def tenant_list_view(request):
+    if not request.user.is_authenticated:
+        return redirect('landlord_login')
     return render(request, "home_app/tenant-list.html")
