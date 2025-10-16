@@ -2,13 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import TenantRegisterForm
 from .models import Tenant
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url='landlord_login')
 def home_view(request):
     return render(request, "home_app/home.html")
 
+@login_required(login_url='landlord_login')
 def tenant_list_view(request):
     tenants = Tenant.objects.all()
-    return render(request, "home_app/tenant-list.html", {'tenants': tenants})
+    return render(request, "home_app/tenant-list.html")
 
 # Creating a tenant
 def tenant_register(request):
