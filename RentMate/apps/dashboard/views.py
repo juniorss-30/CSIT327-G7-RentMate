@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
 from .forms import TenantRegisterForm
 from .models import Tenant
 from django.contrib.auth.decorators import login_required
@@ -15,6 +17,8 @@ def tenant_list_view(request):
 
 # Creating a tenant
 def tenant_register(request):
+    if not request.user.is_authenticated:
+        return redirect('landlord_login')
     if request.method == 'POST':
         form = TenantRegisterForm(request.POST)
         if form.is_valid():
