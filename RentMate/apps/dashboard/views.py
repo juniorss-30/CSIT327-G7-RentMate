@@ -1,17 +1,28 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from .forms import TenantRegisterForm
 from .models import Tenant
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url='landlord_login')
+def home_view(request):
+    return render(request, "home_app/home.html")
+
+@login_required(login_url='landlord_login')
+def tenant_list_view(request):
+    tenants = Tenant.objects.all()
+    return render(request, "home_app/tenant-list.html")
+
+# Creating a tenant
 def tenant_register(request):
     if not request.user.is_authenticated:
         return redirect('landlord_login')
     if request.method == 'POST':
         form = TenantRegisterForm(request.POST)
         if form.is_valid():
-            tenant = Tenant.objects.create(
+            Tenant.objects.create(
                 email=form.cleaned_data['email'],
                 first_name=form.cleaned_data['first_name'],
                 last_name=form.cleaned_data['last_name'],
@@ -27,21 +38,34 @@ def tenant_register(request):
                 contract_url=form.cleaned_data['contract_url'],
                 status=form.cleaned_data['status']
             )
-            messages.success(request, f'Tenant account created for {tenant.first_name} {tenant.last_name}!')
+            messages.success(request, 'Tenant created successfully!')
             return redirect('tenant_list')
     else:
         form = TenantRegisterForm()
-
     return render(request, 'home_app/tenant-account-register.html', {'form': form})
 
 
-def home_view(request):
-    if not request.user.is_authenticated:
-        return redirect('landlord_login')
-    return render(request, "home_app/home.html")
+# Editing a tenant
+def edit_tenant(request, tenant_id):
+    tenant = get_object_or_404(Tenant, id=tenant_id)
+
+    if request.method == 'POST':
+        form = TenantRegisterForm(request.POST, instance=tenant)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tenant updated successfully!')
+            return redirect('tenant_list')
+    else:
+        form = TenantRegisterForm(instance=tenant)
+
+    return render(request, 'home_app/tenant-account-register.html', {
+        'form': form,
+        'edit_mode': True
+    })
 
 
-def tenant_list_view(request):
-    if not request.user.is_authenticated:
-        return redirect('landlord_login')
-    return render(request, "home_app/tenant-list.html")
+def delete_tenant(request, tenant_id):
+    tenant = get_object_or_404(Tenant, id=tenant_id)
+    tenant.delete()
+    messages.success(request, 'Tenant deleted successfully!')
+    return redirect('tenant_list')

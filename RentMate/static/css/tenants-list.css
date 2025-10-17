@@ -234,22 +234,45 @@
     .btn-edit {
         background-color: #4169E1;
         color: white;
+        padding: 12px 28px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
     }
 
     .btn-edit:hover {
         background-color: #315AC1;
         transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(65, 105, 225, 0.4);
+        box-shadow: 0 4px 12px rgba(65, 105, 225, 0.4);
     }
 
     .btn-delete {
         background-color: #ef4444;
         color: white;
+        padding: 12px 28px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
     }
 
     .btn-delete:hover {
         background-color: #dc2626;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 
     /* Form Fields */
@@ -327,3 +350,53 @@
         .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #4a4a4a; }
         .main-content { padding: 25px; }
     }
+
+    .form-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    justify-content: flex-end;
+}
+
+.btn-cancel {
+    background-color: #ef4444;
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+    background-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.btn-submit {
+    background-color: #4169E1;
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+    background-color: #315AC1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(65, 105, 225, 0.4);
+}
