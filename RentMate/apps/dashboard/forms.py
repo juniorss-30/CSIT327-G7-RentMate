@@ -1,9 +1,10 @@
 from django import forms
 from .models import Tenant
 import re
+from django.contrib.auth.hashers import make_password
 
 class TenantRegisterForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, required=False)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
 
     class Meta:
         model = Tenant
@@ -15,7 +16,7 @@ class TenantRegisterForm(forms.ModelForm):
         widgets = {
             'lease_start': forms.DateInput(attrs={'type': 'date'}),
             'lease_end': forms.DateInput(attrs={'type': 'date'}),
-        }
+        }   
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get('instance', None)
@@ -25,11 +26,11 @@ class TenantRegisterForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        qs = Tenant.objects.filter(email=email)
+        qs = Tenant.objects.filter(email=email, is_active=True)
         if self.instance:
             qs = qs.exclude(id=self.instance.id)
         if qs.exists():
-            raise forms.ValidationError('Email is already used.')
+            raise forms.ValidationError('Email is already used by an active tenant.')
         return email
 
     def clean_first_name(self):
@@ -50,10 +51,10 @@ class TenantRegisterForm(forms.ModelForm):
             raise forms.ValidationError('Phone number must not contain letters.')
         return phone_number
 
-    def clean(self):
-        cleaned_data = super().clean()
-        lease_start = cleaned_data.get('lease_start')
-        lease_end = cleaned_data.get('lease_end')
-        if lease_start and lease_end and lease_end < lease_start:
-            raise forms.ValidationError("Lease end date cannot be before start date.")
-        return cleaned_data
+    def save(self, commit=True):
+        tenant = super().save(commit=False)
+        # Always hash the password before saving
+        tenant.password = make_password(self.cleaned_data['password'])
+        if commit:
+            tenant.save()
+        return tenant
