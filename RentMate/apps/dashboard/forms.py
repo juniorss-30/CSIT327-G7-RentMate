@@ -1,21 +1,45 @@
 from django import forms
 from .models import Tenant, MaintenanceRequest
+from django.contrib.auth.models import User
 import re
 
 class TenantRegisterForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, required=False)
-
     class Meta:
-        model = Tenant
-        fields = [
-            'email', 'first_name', 'last_name', 'address', 'phone_number', 
-            'password', 'unit', 'lease_start', 'lease_end', 'rent', 'deposit', 
-            'payment_status', 'contract_url', 'status'
-        ]
+        model = User
+        fields = ['first_name', 'last_name']
         widgets = {
             'lease_start': forms.DateInput(attrs={'type': 'date'}),
             'lease_end': forms.DateInput(attrs={'type': 'date'}),
         }
+    email = forms.EmailField(max_length=100, required=True)
+    first_name = forms.CharField(max_length=100, required=True)
+    last_name = forms.CharField(max_length=100, required=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=False)
+    address = forms.CharField(max_length=100, required=True, widget=forms.TextInput())
+    phone_number = forms.CharField(max_length=100, required=True,widget=forms.TextInput())
+
+    unit = forms.CharField(max_length=50, required=True,widget=forms.TextInput())
+    lease_start = forms.DateField(required=True,widget=forms.DateInput(attrs={'type': 'date'}   ))
+    lease_end = forms.DateField(required=True,widget=forms.DateInput(attrs={'type': 'date'}))
+    rent = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
+    deposit = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
+
+    PAYMENT_STATUS_CHOICES = [
+        ('Paid', 'Paid'),
+        ('Pending', 'Pending'),
+        ('Overdue', 'Overdue'),
+    ]
+
+    STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('Terminated', 'Terminated'),
+        ('Pending', 'Pending'),
+        ('Expired', 'Expired'),
+    ]
+
+    payment_status = forms.ChoiceField(required=True, choices=PAYMENT_STATUS_CHOICES)
+    contract_url = forms.URLField(required=True,widget=forms.TextInput())
+    status = forms.ChoiceField(required=True, choices=STATUS_CHOICES)
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get('instance', None)
@@ -25,9 +49,9 @@ class TenantRegisterForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        qs = Tenant.objects.filter(email=email)
-        if self.instance:
-            qs = qs.exclude(id=self.instance.id)
+        qs = Tenant.objects.filter(user__email=email)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
             raise forms.ValidationError('Email is already used.')
         return email
@@ -67,6 +91,7 @@ class MaintenanceRequestForm(forms.ModelForm):
         ('Others', 'Others'),
     ]
     maintenance_type = forms.ChoiceField(required=True, choices=MAINTENANCE_CHOICES, label="Choose a Maintenance Option", widget=forms.Select(attrs={'class': 'form-group'}))
+
     other_description = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': 'If others, please provide a description','rows': 2}))
     description = forms.CharField(required=True, widget=forms.Textarea(attrs={'placeholder': 'Enter description of the Issue','rows': 4}))
 

@@ -54,8 +54,19 @@
             <h1>{% if edit_mode %}Edit Tenant{% else %}Add New Tenant{% endif %}</h1>
         </div>
 
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'error' %}
+                    <div class="error-message">{{ message }}</div>
+                {% else %}
+                    <div class="success-message">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
         <div class="tenants-section">
             <form method="POST">
+
                 {% csrf_token %}
                 
                 <h3>Tenant Information</h3>
@@ -161,6 +172,7 @@
                     <div class="form-group">
                         <label>Payment Status</label>
                         <select name="payment_status">
+                            <option value="" disabled selected hidden>Select Payment Status</option>
                             <option value="Paid" {% if form.payment_status.value == "Paid" %}selected{% endif %}>Paid</option>
                             <option value="Pending" {% if form.payment_status.value == "Pending" %}selected{% endif %}>Pending</option>
                             <option value="Overdue" {% if form.payment_status.value == "Overdue" %}selected{% endif %}>Overdue</option>
@@ -182,6 +194,7 @@
                 <div class="form-group">
                     <label>Status</label>
                     <select name="status">
+                        <option value="" disabled selected hidden>Select Status</option>
                         <option value="Active" {% if form.status.value == "Active" %}selected{% endif %}>Active</option>
                         <option value="Terminated" {% if form.status.value == "Terminated" %}selected{% endif %}>Terminated</option>
                         <option value="Pending" {% if form.status.value == "Pending" %}selected{% endif %}>Pending</option>

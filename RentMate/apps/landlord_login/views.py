@@ -28,7 +28,7 @@ def landlord_login(request):
                 logger.info(f"Landlord {user.email} logged in successfully")
                 return redirect('home')  # Redirect to dashboard
             except LandlordProfile.DoesNotExist:
-                messages.error(request, 'Account not found or not a landlord account.')
+                messages.error(request, 'Account not found or not a landlord account')
                 logger.warning(f"Login attempt with landlord account but no profile: {email}")
         else:
             messages.error(request, 'Invalid Credentials')
@@ -40,20 +40,23 @@ def tenant_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        return redirect('tenant_home')  # Temporary
-        # checks if email is registered in Tenant table in database
-        try:
-            tenant = Tenant.objects.get(email=email)
-            if password == tenant.password:
-                logger.info(f"Landlord {user.email} logged in successfully")
+
+        #User authentication
+        user = authenticate(request, username=email, password=password)
+
+        if user is not None:
+            try:
+                tenant = Tenant.objects.get(user=user)
+                login(request, user)
+                logger.info(f"Tenant {user.email} logged in successfully")
                 return redirect('tenant_home')  # Redirect to dashboard
-            else:
-                messages.error(request, 'Invalid Credentials')
-                logger.warning(f"Failed login attempt for email: {email}")
-        except:
+            except Tenant.DoesNotExist:
+                messages.error(request, 'Account not found or not a tenant account')
+                logger.warning(f"Login attempt with tenant account but no profile: {email}")
+        else:
             messages.error(request, 'Invalid Credentials')
-            logger.warning(f"Login attempt with non-existing email: {email}")
-            return render(request, 'logins/tenant-login.html')
+            logger.warning(f"Failed login attempt for email: {email}")
+
     return render(request, 'logins/tenant-login.html')
 
 def index(request):

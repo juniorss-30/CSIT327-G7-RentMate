@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.db import transaction
 
 from .forms import TenantRegisterForm, MaintenanceRequestForm
 from .models import Tenant, MaintenanceRequest
+from..landlord_login.models import LandlordProfile
 from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='landlord_login')
@@ -16,20 +19,27 @@ def tenant_list_view(request):
     tenants = Tenant.objects.all()
     return render(request, "home_app/tenant-list.html")
 
-# Creating a tenant
+@transaction.atomic # Creating a tenant
 def tenant_register(request):
     if not request.user.is_authenticated:
         return redirect('landlord_login')
     if request.method == 'POST':
         form = TenantRegisterForm(request.POST)
         if form.is_valid():
-            Tenant.objects.create(
-                email=form.cleaned_data['email'],
+            email = form.cleaned_data['email']
+            user = User.objects.create_user(
+                username=email,
+                email=email,
                 first_name=form.cleaned_data['first_name'],
                 last_name=form.cleaned_data['last_name'],
+                password=form.cleaned_data['last_name'] + '123456',
+            )
+
+            Tenant.objects.create(
+                user=user,
+                assigned_landlord=LandlordProfile.objects.get(user=request.user),
                 address=form.cleaned_data['address'],
                 phone_number=form.cleaned_data['phone_number'],
-                password=form.cleaned_data['last_name'] + '123456',
                 unit=form.cleaned_data['unit'],
                 lease_start=form.cleaned_data['lease_start'],
                 lease_end=form.cleaned_data['lease_end'],
