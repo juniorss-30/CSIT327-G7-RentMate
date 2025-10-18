@@ -1,5 +1,5 @@
 from django import forms
-from .models import Tenant
+from .models import Tenant, MaintenanceRequest
 import re
 from django.contrib.auth.hashers import make_password
 
@@ -9,14 +9,14 @@ class TenantRegisterForm(forms.ModelForm):
     class Meta:
         model = Tenant
         fields = [
-            'email', 'first_name', 'last_name', 'address', 'phone_number', 
-            'password', 'unit', 'lease_start', 'lease_end', 'rent', 'deposit', 
+            'email', 'first_name', 'last_name', 'address', 'phone_number',
+            'password', 'unit', 'lease_start', 'lease_end', 'rent', 'deposit',
             'payment_status', 'contract_url', 'status'
         ]
         widgets = {
             'lease_start': forms.DateInput(attrs={'type': 'date'}),
             'lease_end': forms.DateInput(attrs={'type': 'date'}),
-        }   
+        }
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get('instance', None)
@@ -51,10 +51,45 @@ class TenantRegisterForm(forms.ModelForm):
             raise forms.ValidationError('Phone number must not contain letters.')
         return phone_number
 
+    def clean(self):
+        cleaned_data = super().clean()
+        lease_start = cleaned_data.get('lease_start')
+        lease_end = cleaned_data.get('lease_end')
+        if lease_start and lease_end and lease_end < lease_start:
+            raise forms.ValidationError("Lease end date cannot be before start date.")
+        return cleaned_data
+
     def save(self, commit=True):
         tenant = super().save(commit=False)
-        # Always hash the password before saving
         tenant.password = make_password(self.cleaned_data['password'])
         if commit:
             tenant.save()
         return tenant
+
+
+class MaintenanceRequestForm(forms.ModelForm):
+    MAINTENANCE_CHOICES = [
+        ('Plumbing', 'Plumbing'),
+        ('Electrical', 'Electrical'),
+        ('Appliance', 'Appliance'),
+        ('Structural', 'Structural'),
+        ('Others', 'Others'),
+    ]
+    maintenance_type = forms.ChoiceField(
+        required=True,
+        choices=MAINTENANCE_CHOICES,
+        label="Choose a Maintenance Option",
+        widget=forms.Select(attrs={'class': 'form-group'})
+    )
+    other_description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'placeholder': 'If others, please provide a description','rows': 2})
+    )
+    description = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={'placeholder': 'Enter description of the Issue','rows': 4})
+    )
+
+    class Meta:
+        model = MaintenanceRequest
+        fields = ['maintenance_type', 'other_description', 'description']
