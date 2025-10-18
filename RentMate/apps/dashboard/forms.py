@@ -1,5 +1,5 @@
 from django import forms
-from .models import Tenant
+from .models import Tenant, MaintenanceRequest
 import re
 
 class TenantRegisterForm(forms.ModelForm):
@@ -57,3 +57,19 @@ class TenantRegisterForm(forms.ModelForm):
         if lease_start and lease_end and lease_end < lease_start:
             raise forms.ValidationError("Lease end date cannot be before start date.")
         return cleaned_data
+
+class MaintenanceRequestForm(forms.ModelForm):
+    MAINTENANCE_CHOICES = [
+        ('Plumbing', 'Plumbing'),
+        ('Electrical', 'Electrical'),
+        ('Appliance', 'Appliance'),
+        ('Structural', 'Structural'),
+        ('Others', 'Others'),
+    ]
+    maintenance_type = forms.ChoiceField(required=True, choices=MAINTENANCE_CHOICES, label="Choose a Maintenance Option", widget=forms.Select(attrs={'class': 'form-group'}))
+    other_description = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': 'If others, please provide a description','rows': 2}))
+    description = forms.CharField(required=True, widget=forms.Textarea(attrs={'placeholder': 'Enter description of the Issue','rows': 4}))
+
+    class Meta:
+        model = MaintenanceRequest
+        fields = ['maintenance_type','other_description','description']

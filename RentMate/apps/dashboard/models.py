@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Tenant(models.Model):
@@ -23,3 +24,14 @@ class Tenant(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+class MaintenanceRequest(models.Model):
+    requester = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_requested = models.DateField()
+    maintenance_type = models.CharField(max_length=20)
+    request_status = models.CharField(max_length=20, default="Pending")
+    other_description= models.TextField(default="")
+    description = models.TextField()
+
+    def __str__(self):
+        return f"{self.maintenance_type} - {self.date_requested}"

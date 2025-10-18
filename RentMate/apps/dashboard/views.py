@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
-from .forms import TenantRegisterForm
-from .models import Tenant
+from .forms import TenantRegisterForm, MaintenanceRequestForm
+from .models import Tenant, MaintenanceRequest
 from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='landlord_login')
@@ -69,3 +70,27 @@ def delete_tenant(request, tenant_id):
     tenant.delete()
     messages.success(request, 'Tenant deleted successfully!')
     return redirect('tenant_list')
+
+
+#Tenant Side Dashboard
+@login_required(login_url='tenant_login')
+def tenant_home_view(request):
+    return render(request, "home_app_tenant/tenant-home.html")
+
+@login_required(login_url='tenant_login')
+def tenant_maintenance_add_view(request):
+    if request.method == 'POST':
+        form = MaintenanceRequestForm(request.POST)
+        if form.is_valid():
+            MaintenanceRequest.objects.create(
+                requester=request.user,
+                date_requested = timezone.localtime().date(),
+                maintenance_type = form.cleaned_data['maintenance_type'],
+                other_description = form.cleaned_data['other_description'],
+                description = form.cleaned_data['description'],
+            )
+            messages.success(request, 'Maintenance request created successfully!')
+            return render(request,'home_app_tenant/tenant-maintenance.html', {'form': form})
+    else:
+        form =MaintenanceRequestForm()
+    return render(request,'home_app_tenant/tenant-maintenance.html', {'form': form})

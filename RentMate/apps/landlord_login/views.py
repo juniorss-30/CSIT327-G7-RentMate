@@ -40,10 +40,16 @@ def tenant_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-
+        return redirect('tenant_home')  # Temporary
         # checks if email is registered in Tenant table in database
         try:
             tenant = Tenant.objects.get(email=email)
+            if password == tenant.password:
+                logger.info(f"Landlord {user.email} logged in successfully")
+                return redirect('tenant_home')  # Redirect to dashboard
+            else:
+                messages.error(request, 'Invalid Credentials')
+                logger.warning(f"Failed login attempt for email: {email}")
         except:
             messages.error(request, 'Invalid Credentials')
             logger.warning(f"Login attempt with non-existing email: {email}")
