@@ -20,6 +20,7 @@ class Tenant(models.Model):
 
     first_login = models.BooleanField(default=True)
     is_active = models.BooleanField(default=False)
+    last_login = models.DateTimeField(blank=True, null=True)
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
